@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ABSENT ENTITY</title>
+  <title>ABSENT ENTITY - Tribute Portal</title>
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     body {
       margin: 0;
@@ -12,16 +13,14 @@
       font-family: 'Courier New', monospace;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      min-height: 100vh;
       padding: 2rem;
     }
 
     .container {
       text-align: center;
-      width: 100%;
       max-width: 600px;
+      width: 100%;
     }
 
     h1 {
@@ -34,7 +33,7 @@
       margin: 12px 0;
     }
 
-    a {
+    button {
       text-decoration: none;
       color: #fff;
       background-color: #222;
@@ -42,11 +41,18 @@
       border: 1px solid #444;
       border-radius: 3px;
       font-size: 14px;
-      display: inline-block;
+      cursor: pointer;
     }
 
-    a:hover {
+    button:hover {
       background-color: #444;
+    }
+
+    #card-element {
+      margin: 20px 0;
+      background: #fff;
+      padding: 12px;
+      border-radius: 4px;
     }
 
     .footer {
@@ -57,28 +63,59 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>you crossed the threshold. payment is now owed.</h1>
+<div class="container">
+  <h1>you crossed the threshold. payment is now owed.</h1>
 
+  <div id="payment-form">
+    <div id="card-element"></div>
     <div class="tier">
-      <a href="https://buy.stripe.com/8wMdUM82L5DC5Og002" target="_blank">[intake 001]</a>
+      <button onclick="pay(7700)">[intake 001]</button>
     </div>
     <div class="tier">
-      <a href="https://buy.stripe.com/14k1803Mvfec2C48wz" target="_blank">[deconstruct 004]</a>
+      <button onclick="pay(14400)">[deconstruct 004]</button>
     </div>
     <div class="tier">
-      <a href="https://buy.stripe.com/4gwg2U96P8POgsUeUY" target="_blank">[breach node 007]</a>
+      <button onclick="pay(28800)">[breach node 007]</button>
     </div>
     <div class="tier">
-      <a href="https://buy.stripe.com/fZeaIA4Qz9TS5OgdQV" target="_blank">[threshold issued]</a>
+      <button onclick="pay(55500)">[threshold issued]</button>
     </div>
     <div class="tier">
-      <a href="https://buy.stripe.com/fZebME82L3vuekM006" target="_blank">[silent stream]</a>
-    </div>
-
-    <div class="footer">
-      regret is not a recognized protocol.
+      <button onclick="pay(6600)">[silent stream]</button>
     </div>
   </div>
+
+  <div class="footer">
+    regret is not a recognized protocol.
+  </div>
+</div>
+
+<script>
+const stripe = Stripe('pk_live_51RHi4SCFj9Y32aLtSRGbUvPXyeMzCwO8xsV4BGL9iSrvy9zwZDXxgSK8z0nH5ZdJCi7wLquW3QLKlH77EcWTD8HP00bV9wqNoq'); // TODO: replace with your actual publishable key
+
+const elements = stripe.elements();
+const card = elements.create("card");
+card.mount("#card-element");
+
+async function pay(amount) {
+  const { clientSecret } = await fetch("http://localhost:4242/create-payment-intent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount })
+  }).then(r => r.json());
+
+  const { error } = await stripe.confirmCardPayment(clientSecret, {
+    payment_method: {
+      card: card,
+    }
+  });
+
+  if (error) {
+    alert(error.message);
+  } else {
+    alert("tribute received.");
+  }
+}
+</script>
 </body>
 </html>
