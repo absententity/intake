@@ -24,51 +24,10 @@
       max-width: 600px;
     }
 
-    #top-line {
-      font-size: 2rem;
-      letter-spacing: 0.1em;
-      margin-bottom: 1rem;
-    }
-
-    .entry-prompt, input[type="text"], button {
-      opacity: 1;
-      transition: none;
-    }
-
-    .entry-prompt {
-      font-size: 1rem;
-      color: #999;
-      margin-bottom: 2rem;
-    }
-
-    input[type="text"] {
-      background: #0b0b0b;
-      color: #8B0000;
-      border: none;
-      border-bottom: 1px solid #666;
-      padding: 0.75rem;
-      width: 100%;
-      margin-bottom: 1rem;
-      font-size: 1rem;
+    h1 {
+      font-weight: normal;
       letter-spacing: 0.05em;
-      text-align: center;
-      outline: none;
-      caret-color: #8B0000;
-    }
-
-    button {
-      background: #0b0b0b;
-      border: 1px solid #666;
-      color: #f4f4f4;
-      padding: 0.5rem 1.5rem;
-      cursor: pointer;
-    }
-
-    .tiers {
-      margin-top: 2rem;
-      display: none;
-      flex-direction: column;
-      align-items: center;
+      margin-bottom: 20px;
     }
 
     .tier {
@@ -99,54 +58,27 @@
 </head>
 <body>
   <div class="container">
-    <div id="top-line">
-      <span id="static">⟴ </span><span id="signal">signal trace: unstable.</span>
-    </div>
-    <div class="entry-prompt" id="prompt">you were not invited. you simply stayed too long.</div>
-    <input type="text" id="phraseInput" placeholder="">
-    <button onclick="validatePhrase()">submit</button>
+    <h1>you crossed the threshold. payment is now owed.</h1>
 
-    <div class="tiers" id="tiers">
-      <h1>you crossed the threshold. payment is now owed.</h1>
-      <div class="tier">
-        <a href="https://buy.stripe.com/8wMdUM82L5DC5Og002">[intake 001]</a>
-      </div>
-      <div class="tier">
-        <a href="https://buy.stripe.com/14k1803Mvfec2C48wz">[deconstruct 004]</a>
-      </div>
-      <div class="tier">
-        <a href="https://buy.stripe.com/4gwg2U96P8POgsUeUY">[breach node 007]</a>
-      </div>
-      <div class="tier">
-        <a href="https://buy.stripe.com/fZeaIA4Qz9TS5OgdQV">[threshold issued]</a>
-      </div>
-      <div class="tier">
-        <a href="https://buy.stripe.com/fZebME82L3vuekM006">[silent stream]</a>
-      </div>
-      <div class="footer">
-        regret is not a recognized protocol.
-      </div>
+    <div class="tier">
+      <a href="https://buy.stripe.com/8wMdUM82L5DC5Og002" target="_blank">[intake 001]</a>
+    </div>
+    <div class="tier">
+      <a href="https://buy.stripe.com/14k1803Mvfec2C48wz" target="_blank">[deconstruct 004]</a>
+    </div>
+    <div class="tier">
+      <a href="https://buy.stripe.com/4gwg2U96P8POgsUeUY" target="_blank">[breach node 007]</a>
+    </div>
+    <div class="tier">
+      <a href="https://buy.stripe.com/fZeaIA4Qz9TS5OgdQV" target="_blank">[threshold issued]</a>
+    </div>
+    <div class="tier">
+      <a href="https://buy.stripe.com/fZebME82L3vuekM006" target="_blank">[silent stream]</a>
+    </div>
+
+    <div class="footer">
+      regret is not a recognized protocol.
     </div>
   </div>
-
-  <script>
-    const phrase = "this is not a request";
-
-    function validatePhrase() {
-      const userInput = document.getElementById('phraseInput').value.trim();
-      if (userInput === phrase) {
-        document.getElementById('phraseInput').style.display = 'none';
-        document.querySelector('button').style.display = 'none';
-        document.getElementById('prompt').style.display = 'none';
-        document.getElementById('top-line').style.display = 'none';
-        document.getElementById('tiers').style.display = 'flex';
-      } else {
-        alert("you were seen. you were weighed. you were denied.");
-        document.body.innerHTML = "";
-        document.body.style.backgroundColor = "black";
-        setTimeout(() => window.close(), 500);
-      }
-    }
-  </script>
 </body>
 </html>
