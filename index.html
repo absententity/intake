@@ -15,7 +15,6 @@
       flex-direction: column;
       min-height: 100vh;
     }
-
     main {
       flex: 1;
       display: flex;
@@ -25,13 +24,11 @@
       text-align: center;
       padding: 2rem;
     }
-
     h1, h2 {
       font-weight: normal;
       letter-spacing: 0.05em;
       margin-bottom: 1rem;
     }
-
     button {
       background-color: #222;
       color: #fff;
@@ -42,18 +39,19 @@
       border-radius: 4px;
       margin: 12px 0;
     }
-
     button:hover {
       background-color: #444;
     }
-
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
     #tribute-section {
       display: none;
       flex-direction: column;
       align-items: center;
       margin-top: 2rem;
     }
-
     .final-message {
       font-size: 1.2rem;
       margin-top: 2rem;
@@ -61,13 +59,11 @@
       opacity: 0;
       animation: fadeIn 2s forwards;
     }
-
     @keyframes fadeIn {
       to {
         opacity: 1;
       }
     }
-
     footer {
       text-align: center;
       font-size: 0.7rem;
@@ -81,16 +77,12 @@
 <main>
   <h1 id="threshold-message">entry is voluntary. submission is irreversible.</h1>
   <button id="proceed-button" onclick="showTribute()">i submit</button>
-
   <div id="tribute-section">
-    <button onclick="startTribute(7700)">[intake 001]</button>
-    <button onclick="startTribute(14400)">[deconstruct 004]</button>
-    <button onclick="startTribute(28800)">[breach node 007]</button>
-    <button onclick="startTribute(55500)">[threshold issued]</button>
-    <button onclick="startTribute(6600)">[silent stream]</button>
-    <button onclick="simulatePayment()">[simulate tribute]</button>
-  </div>
-
+    <button id="btn-intake" disabled onclick="startTribute(7700)">[intake 001]</button>
+    <button id="btn-deconstruct" disabled onclick="startTribute(14400)">[deconstruct 004]</button>
+    <button id="btn-breach" disabled onclick="startTribute(28800)">[breach node 007]</button>
+    <button id="btn-threshold" disabled onclick="startTribute(55500)">[threshold issued]</button>
+          </div>
   <div id="payment-page" style="display:none; flex-direction: column; align-items: center;">
     <h1>crossing confirmed. severance mandated.</h1>
     <h2 id="offering-amount"></h2>
@@ -98,35 +90,24 @@
     <button id="confirm-button" onclick="confirmPayment()">confirm offering</button>
   </div>
 </main>
-
 <footer>
   by proceeding, you acknowledge full voluntary entry and waive all claims.<br>
   false reports will be bound to the sender’s ip and mirrored karmically. no warnings. no reversals.
 </footer>
-
 <script>
-let stripe;
-let elements;
+let stripe = Stripe('pk_live_51RHi4SCFj9Y32aLtSRGbUvPXyeMzCwO8xsV4BGL9iSrvy9zwZDXxgSK8z0nH5ZdJCi7wLquW3QLKlH77EcWTD8HP00bV9wqNoq');
+let elements = stripe.elements();
 let card;
 let currentAmount;
-
-window.addEventListener('load', function() {
-  stripe = Stripe('pk_live_51RHi4SCFj9Y32aLtSRGbUvPXyeMzCwO8xsV4BGL9iSrvy9zwZDXxgSK8z0nH5ZdJCi7wLquW3QLKlH77EcWTD8HP00bV9wqNoq');
-  elements = stripe.elements();
-});
 
 function showTribute() {
   document.getElementById('threshold-message').style.display = 'none';
   document.getElementById('proceed-button').style.display = 'none';
   document.getElementById('tribute-section').style.display = 'flex';
+  document.querySelectorAll('#tribute-section button').forEach(btn => btn.disabled = false);
 }
 
 function startTribute(amount) {
-  if (!stripe || !elements) {
-    alert('Stripe not ready. Please reload the page.');
-    return;
-  }
-
   currentAmount = amount;
   document.getElementById('tribute-section').style.display = 'none';
   document.getElementById('payment-page').style.display = 'flex';
@@ -150,7 +131,6 @@ function simulatePayment() {
 
 function displayFinalSequence() {
   document.body.innerHTML = '<main><div class="final-message" id="final-message"></div></main>';
-
   setTimeout(() => {
     document.getElementById('final-message').textContent = 'offering logged.';
     setTimeout(() => {
@@ -161,9 +141,7 @@ function displayFinalSequence() {
           document.getElementById('final-message').textContent = 'departure observed.';
           setTimeout(() => {
             document.getElementById('final-message').textContent = 'archive closed.';
-            setTimeout(() => {
-              window.close();
-            }, 2000);
+            setTimeout(() => { window.close(); }, 2000);
           }, 2000);
         }, 2000);
       }, 2000);
@@ -177,20 +155,20 @@ function pay(amount) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount })
   })
-    .then(r => r.json())
-    .then(({ clientSecret }) => {
-      stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: card
-        }
-      }).then(({ error }) => {
-        if (error) {
-          alert(error.message);
-        } else {
-          displayFinalSequence();
-        }
-      });
+  .then(r => r.json())
+  .then(({ clientSecret }) => {
+    stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: card
+      }
+    }).then(({ error }) => {
+      if (error) {
+        alert(error.message);
+      } else {
+        displayFinalSequence();
+      }
     });
+  });
 }
 </script>
 </body>
