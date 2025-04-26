@@ -1,121 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ABSENT ENTITY - Tribute Portal</title>
-  <script src="https://js.stripe.com/v3/"></script>
-  <style>
-    body {
-      margin: 0;
-      background-color: #0b0b0b;
-      color: #f4f4f4;
-      font-family: 'Courier New', monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-
-    .container {
-      text-align: center;
-      max-width: 600px;
-      width: 100%;
-    }
-
-    h1 {
-      font-weight: normal;
-      letter-spacing: 0.05em;
-      margin-bottom: 20px;
-    }
-
-    .tier {
-      margin: 12px 0;
-    }
-
-    button {
-      text-decoration: none;
-      color: #fff;
-      background-color: #222;
-      padding: 10px 18px;
-      border: 1px solid #444;
-      border-radius: 3px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #444;
-    }
-
-    #card-element {
-      margin: 20px 0;
-      background: #fff;
-      padding: 12px;
-      border-radius: 4px;
-    }
-
-    .footer {
-      margin-top: 2rem;
-      font-size: 11px;
-      color: #555;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABSENT ENTITY - Tribute Portal</title>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+body {
+  margin: 0;
+  background-color: #0b0b0b;
+  color: #f4f4f4;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+h1, h2, p {
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  margin-bottom: 2rem;
+}
+button {
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 12px 0;
+}
+button:hover {
+  background-color: #444;
+}
+#tribute-section, #confirm-section, #silent-stream-section {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+}
+.faint-glow {
+  color: #aaa;
+  text-shadow: 0 0 8px #555;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+.glitch-button {
+  position: relative;
+  overflow: hidden;
+  animation: glitchButton 2s infinite;
+}
+@keyframes glitchButton {
+  0% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
+</style>
 </head>
 <body>
-<div class="container">
-  <h1>you crossed the threshold. payment is now owed.</h1>
+<main>
+<h1 id="threshold-message">entry is voluntary. submission is irreversible.</h1>
+<button id="proceed-button" onclick="showTribute()">i submit</button>
 
-  <div id="payment-form">
-    <div id="card-element"></div>
-    <div class="tier">
-      <button onclick="pay(7700)">[intake 001]</button>
-    </div>
-    <div class="tier">
-      <button onclick="pay(14400)">[deconstruct 004]</button>
-    </div>
-    <div class="tier">
-      <button onclick="pay(28800)">[breach node 007]</button>
-    </div>
-    <div class="tier">
-      <button onclick="pay(55500)">[threshold issued]</button>
-    </div>
-    <div class="tier">
-      <button onclick="pay(6600)">[silent stream]</button>
-    </div>
-  </div>
-
-  <div class="footer">
-    regret is not a recognized protocol.
-  </div>
+<div id="tribute-section">
+  <h1>choose your offering</h1>
+  <button onclick="preparePayment(7700, '[intake 001]')">[intake 001]</button>
+  <button onclick="preparePayment(14400, '[deconstruct 004]')">[deconstruct 004]</button>
+  <button onclick="preparePayment(28800, '[breach node 007]')">[breach node 007]</button>
+  <button onclick="preparePayment(55500, '[threshold issued]')">[threshold issued]</button>
+  <button onclick="prepareSilentStream()">[silent stream]</button>
 </div>
 
+<div id="confirm-section">
+  <h1 id="confirm-header">crossing confirmed. severance mandated.</h1>
+  <h2 id="confirm-title"></h2>
+  <h2 id="confirm-amount"></h2>
+  <div id="card-element"></div>
+  <button id="confirm-button">confirm offering</button>
+</div>
+
+<div id="silent-stream-section">
+  <h1 id="silent-header" class="faint-glow"></h1>
+  <h1>[silent stream 066]</h1>
+  <p>66. continuity demanded.</p>
+  <div id="silent-card-element"></div>
+  <button id="silent-bind-button" class="glitch-button">bind to current</button>
+  <p class="tiny-text">once entered, the stream claims you. continuity enforced.</p>
+</div>
+</main>
+
 <script>
-const stripe = Stripe('pk_live_51RHi4SCFj9Y32aLtSRGbUvPXyeMzCwO8xsV4BGL9iSrvy9zwZDXxgSK8z0nH5ZdJCi7wLquW3QLKlH77EcWTD8HP00bV9wqNoq'); // TODO: replace with your actual publishable key
+let stripe;
+let elements;
+let card;
+let silentCard;
 
-const elements = stripe.elements();
-const card = elements.create("card");
-card.mount("#card-element");
+function typeSilentHeader() {
+  const header = document.getElementById('silent-header');
+  header.innerHTML = '';
+  const firstText = 'silent current detected.';
+  const secondText = 'entry into stream requires surrender.';
+  let i = 0;
+  let j = 0;
 
-async function pay(amount) {
-  const { clientSecret } = await fetch("http://localhost:4242/create-payment-intent", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount })
-  }).then(r => r.json());
-
-  const { error } = await stripe.confirmCardPayment(clientSecret, {
-    payment_method: {
-      card: card,
+  function typeFirst() {
+    if (i < firstText.length) {
+      header.innerHTML += firstText.charAt(i);
+      i++;
+      setTimeout(typeFirst, 50);
+    } else {
+      const lineBreak = document.createElement('br');
+      header.appendChild(lineBreak);
+      setTimeout(typeSecond, 400);
     }
-  });
-
-  if (error) {
-    alert(error.message);
-  } else {
-    alert("tribute received.");
   }
+
+  function typeSecond() {
+    if (j < secondText.length) {
+      header.innerHTML += secondText.charAt(j);
+      j++;
+      setTimeout(typeSecond, 50);
+    }
+  }
+
+  typeFirst();
 }
+
+function showTribute() {
+  document.getElementById('threshold-message').style.display = 'none';
+  document.getElementById('proceed-button').style.display = 'none';
+  document.getElementById('tribute-section').style.display = 'flex';
+}
+
+function preparePayment(amount, title) {
+  document.getElementById('tribute-section').style.display = 'none';
+  document.getElementById('confirm-section').style.display = 'flex';
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-amount').textContent = `$${(amount/100).toFixed(2)}`;
+}
+
+function prepareSilentStream() {
+  document.getElementById('tribute-section').style.display = 'none';
+  document.getElementById('silent-stream-section').style.display = 'flex';
+  typeSilentHeader();
+}
+
+window.addEventListener('load', function() {
+  document.getElementById('tribute-section').style.display = 'none';
+
+  stripe = Stripe('pk_live_51RHi4SCFj9Y32aLtSRGbUvPXyeMzCwO8xsV4BGL9iSrvy9zwZDXxgSK8z0nH5ZdJCi7wLquW3QLKlH77EcWTD8HP00bV9wqNoq'); // Replace with your Stripe publishable key
+  elements = stripe.elements();
+
+  card = elements.create('card');
+  card.mount('#card-element');
+
+  silentCard = elements.create('card');
+  silentCard.mount('#silent-card-element');
+});
 </script>
 </body>
 </html>
